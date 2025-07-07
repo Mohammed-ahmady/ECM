@@ -1,0 +1,24 @@
+databases:
+  - name: ecmdb
+    plan: free
+    databaseName: ecmdb
+    user: ecmuser
+
+services:
+  - type: web
+    plan: free
+    name: ecm-website
+    runtime: python
+    buildCommand: './build.sh'
+    startCommand: 'python -m gunicorn ecm_website.wsgi:application -k uvicorn.workers.UvicornWorker'
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ecmdb
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: WEB_CONCURRENCY
+        value: 4
+
+
